@@ -97,7 +97,10 @@ export const useChat = (partnerId?: string) => {
 
       const { data, error } = await supabase
         .from('messages')
-        .select('*')
+        .select(`
+          *,
+          shared_post:posts(*)
+        `)
         .or(`and(sender_id.eq.${user.id},receiver_id.eq.${partnerId}),and(sender_id.eq.${partnerId},receiver_id.eq.${user.id})`)
         .order('created_at', { ascending: true }); // Chat order
 

@@ -292,7 +292,7 @@ const PostCard = ({ post, isPlaying = false }: PostCardProps) => {
           </Button>
         </div>
 
-        {currentUser?.id !== post.user_id && (
+        {currentUser && currentUser.id !== post.user_id && (
           <Button
             variant="ghost"
             size="sm"

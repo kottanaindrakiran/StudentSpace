@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Send, Loader2, Paperclip, X, FileText, Trash2, RefreshCcw } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useChat, sendMessage, deleteMessage } from '@/hooks/useMessages';
@@ -10,6 +10,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { DbUser } from '@/types/database';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { SharedPostCard } from '@/components/chat/SharedPostCard';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -117,7 +118,11 @@ const SharedUserPreview = ({ userId }: { userId: string }) => {
 
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
 import Webcam from 'react-webcam';
-import { Smile, Camera, Sticker, Image as ImageIcon, FolderKanban as FolderIcon, Search } from 'lucide-react';
+import {
+    Send, Image as ImageIcon, Video, Mic, Smile, MoreVertical,
+    Phone, Video as VideoIcon, ArrowLeft, Loader2, Download, Camera, Sticker, FolderKanban as FolderIcon, Search,
+    Paperclip, X, FileText, Trash2, RefreshCcw
+} from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { STICKERS } from '@/data/stickers';
@@ -348,18 +353,23 @@ const Chat = () => {
                                                     {msg.attachment_type === 'image' || msg.attachment_type === 'video' ? (
                                                         <ArrowLeft className="w-4 h-4 rotate-[-90deg]" />
                                                     ) : (
-                                                        <FileText className="w-4 h-4" />
+                                                        <Download className="w-4 h-4" />
                                                     )}
-                                                    <span className="underline truncate max-w-[150px]">
-                                                        Download {msg.attachment_type ? msg.attachment_type : 'File'}
-                                                    </span>
+                                                    Download Attachment
                                                 </a>
                                             )}
                                         </div>
                                     )}
 
+                                    {/* Shared Post Card */}
+                                    {(msg as any).shared_post && (
+                                        <div className="mb-2 w-64">
+                                            <SharedPostCard post={(msg as any).shared_post} />
+                                        </div>
+                                    )}
+
                                     {/* Shared Content */}
-                                    {msg.shared_post_id && <SharedPostPreview postId={msg.shared_post_id} />}
+                                    {/* msg.shared_post_id is now handled by msg.shared_post */}
                                     {msg.shared_project_id && <SharedProjectPreview projectId={msg.shared_project_id} />}
                                     {msg.shared_user_id && <SharedUserPreview userId={msg.shared_user_id} />}
 

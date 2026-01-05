@@ -25,6 +25,7 @@ export interface ProjectWithUser extends DbProject {
 export interface MessageWithUsers extends DbMessage {
   sender: DbUser | null;
   receiver: DbUser | null;
+  shared_post?: DbPost | null;
 }
 
 // Conversation type for messages list
