@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Send, Loader2, Paperclip, X, FileText, Trash2 } from 'lucide-react';
+import { ArrowLeft, Send, Loader2, Paperclip, X, FileText, Trash2, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useChat, sendMessage, deleteMessage } from '@/hooks/useMessages';
@@ -136,6 +136,11 @@ const Chat = () => {
     const webcamRef = useRef<Webcam>(null);
     const [isCameraOpen, setIsCameraOpen] = useState(false);
     const [stickerSearch, setStickerSearch] = useState('');
+    const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
+
+    const toggleCamera = () => {
+        setFacingMode(prev => prev === 'user' ? 'environment' : 'user');
+    };
 
     const { data: currentUser } = useCurrentUser();
     const { data: messages, isLoading } = useChat(userId);
@@ -266,7 +271,7 @@ const Chat = () => {
         : [];
 
     return (
-        <div className="flex flex-col h-screen bg-background">
+        <div className="flex flex-col h-[100dvh] bg-background">
             {/* Header */}
             {/* ... (Header remains same) ... */}
             <header className="sticky top-0 z-40 bg-card/80 backdrop-blur-xl border-b border-border p-4">
@@ -419,14 +424,21 @@ const Chat = () => {
                             </Button>
                         </DialogTrigger>
                         <DialogContent>
-                            <div className="flex flex-col items-center gap-4">
+                            <div className="flex flex-col items-center gap-4 relative">
                                 <Webcam
                                     audio={false}
                                     ref={webcamRef}
                                     screenshotFormat="image/jpeg"
                                     className="rounded-lg w-full"
+                                    videoConstraints={{ facingMode }}
                                 />
-                                <Button onClick={capturePhoto} className="w-full">Capture</Button>
+                                <div className="flex gap-2 w-full">
+                                    <Button onClick={toggleCamera} variant="outline" className="flex-1">
+                                        <RefreshCcw className="w-4 h-4 mr-2" />
+                                        Flip
+                                    </Button>
+                                    <Button onClick={capturePhoto} className="flex-1">Capture</Button>
+                                </div>
                             </div>
                         </DialogContent>
                     </Dialog>
@@ -485,8 +497,10 @@ const Chat = () => {
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
                             placeholder="Type a message..."
-                            className="pr-10"
+                            className="pr-10 text-base md:text-sm"
                             disabled={isUploading}
+                            inputMode="text"
+                            enterKeyHint="send"
                         />
                         {/* Emoji Picker */}
                         <Popover>

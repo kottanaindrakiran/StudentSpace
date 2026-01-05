@@ -120,6 +120,7 @@ const Connect = () => {
         email: formData.email,
         password: formData.password,
         options: {
+          emailRedirectTo: `${window.location.origin}/feed/profile`,
           data: {
             full_name: formData.fullName,
             state: formData.state,

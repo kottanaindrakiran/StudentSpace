@@ -391,9 +391,9 @@ const Profile = () => {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.1 }}
-                      className="bg-card rounded-2xl shadow-soft p-4 flex gap-4 group relative"
+                      className="bg-card rounded-2xl shadow-soft p-4 flex flex-col sm:flex-row gap-4 group relative"
                     >
-                      <div className="w-24 h-24 rounded-xl bg-muted flex items-center justify-center shrink-0">
+                      <div className="w-full sm:w-24 h-32 sm:h-24 rounded-xl bg-muted flex items-center justify-center shrink-0">
                         <FolderKanban className="w-8 h-8 text-muted-foreground" />
                       </div>
                       <div className="flex-1 min-w-0">

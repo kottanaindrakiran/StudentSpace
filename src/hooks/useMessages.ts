@@ -111,7 +111,7 @@ export const sendMessage = async (
   receiverId: string,
   message: string,
   attachmentUrl?: string,
-  attachmentType?: 'image' | 'video' | 'document' | 'zip',
+  attachmentType?: 'image' | 'video' | 'document' | 'zip' | 'sticker',
   sharedPostId?: string
 ) => {
   const { data: { user } } = await supabase.auth.getUser();

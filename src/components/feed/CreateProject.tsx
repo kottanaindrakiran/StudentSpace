@@ -85,15 +85,27 @@ const CreateProject = ({ onClose }: CreateProjectProps) => {
 
             fileUrl = publicUrl;
 
-            const { error } = await supabase.from('projects').insert({
+            const { data: projectData, error } = await supabase.from('projects').insert({
                 user_id: user.id,
                 project_title: title,
                 description: description,
                 zip_file_url: fileUrl,
                 branch: user.branch,
-            });
+            }).select().single();
 
             if (error) throw error;
+
+            // Also create a post for this project so it appears in the feed
+            const { error: postError } = await supabase.from('posts').insert({
+                user_id: user.id,
+                caption: `${title}\n\n${description}`,
+                media_urls: [fileUrl], // Store zip link as media
+                media_url: fileUrl, // Legacy support
+                post_type: 'project'
+            });
+
+            if (postError) console.error("Failed to create feed post for project:", postError);
+
 
             toast({
                 title: "Project Uploaded! 🎉",

@@ -7,8 +7,9 @@ import type { PostWithUser } from '@/types/database';
 import { formatDistanceToNow } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 
-import { useLikePost, useCommentsCount } from '@/hooks/useInteractions';
+import { useLikePost, useCommentsCount, useBookmark } from '@/hooks/useInteractions';
 import { CommentsSheet } from '@/components/feed/CommentsSheet';
 import { SharePostModal } from '@/components/feed/SharePostModal';
 
@@ -21,6 +22,7 @@ interface PostCardProps {
 import { Link } from 'react-router-dom';
 
 const PostCard = ({ post, isPlaying = false }: PostCardProps) => {
+  const { data: currentUser } = useCurrentUser();
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
@@ -28,6 +30,7 @@ const PostCard = ({ post, isPlaying = false }: PostCardProps) => {
 
   const { likes, isLiked, toggleLike } = useLikePost(post.id);
   const { data: commentsCount } = useCommentsCount(post.id);
+  const { isBookmarked: isBookmarkedHook, toggleBookmark } = useBookmark(post.id);
 
   // Handle auto-play/pause
   useEffect(() => {
@@ -287,17 +290,21 @@ const PostCard = ({ post, isPlaying = false }: PostCardProps) => {
           >
             <Share2 className="w-5 h-5" />
           </Button>
-
         </div>
 
-        <Button
-          variant="ghost"
-          size="icon"
-          className="rounded-full"
-          onClick={() => setIsBookmarked(!isBookmarked)}
-        >
-          <Bookmark className={cn("w-5 h-5", isBookmarked && "fill-current text-primary")} />
-        </Button>
+        {currentUser?.id !== post.user_id && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className={cn(
+              "rounded-full",
+              isBookmarkedHook && "text-primary"
+            )}
+            onClick={() => toggleBookmark()}
+          >
+            <Bookmark className={cn("w-5 h-5", isBookmarkedHook && "fill-current")} />
+          </Button>
+        )}
       </div>
 
       {/* Timestamp */}
