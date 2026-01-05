@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronLeft, ChevronRight, User, Trash2, Eye } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, User, Trash2, Eye, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
@@ -54,6 +54,11 @@ const StoryViewer = ({ stories, onClose }: StoryViewerProps) => {
     const [viewCount, setViewCount] = useState(0);
     const [isViewersOpen, setIsViewersOpen] = useState(false);
 
+    // Likes
+    const [hasLiked, setHasLiked] = useState(false);
+    const [likeCount, setLikeCount] = useState(0);
+    const [isLikeAnimating, setIsLikeAnimating] = useState(false);
+
     // Record View & Fetch Stats
     useEffect(() => {
         if (!currentUser || !story) return;
@@ -68,8 +73,8 @@ const StoryViewer = ({ stories, onClose }: StoryViewerProps) => {
             }
         };
 
-        const fetchViews = async () => {
-            // Only fetch if owner
+        const fetchStats = async () => {
+            // Fetch View Stats (Owner only)
             if (currentUser.id === story.user_id) {
                 const { data, count } = await supabase
                     .from('story_views' as any)
@@ -79,11 +84,68 @@ const StoryViewer = ({ stories, onClose }: StoryViewerProps) => {
                 if (data) setViewers(data as any);
                 if (count !== null) setViewCount(count);
             }
+
+            // Fetch Like Stats (Everyone)
+            // Check if liked by current user
+            const { data: likeData } = await supabase
+                .from('story_likes' as any)
+                .select('id')
+                .eq('story_id', story.id)
+                .eq('user_id', currentUser.id)
+                .maybeSingle();
+
+            setHasLiked(!!likeData);
+
+            // Get total likes
+            const { count: totalLikes } = await supabase
+                .from('story_likes' as any)
+                .select('id', { count: 'exact', head: true })
+                .eq('story_id', story.id);
+
+            setLikeCount(totalLikes || 0);
         };
 
         recordView();
-        fetchViews();
+        fetchStats();
     }, [story.id, currentUser]);
+
+    // Handle Like
+    const handleLike = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!currentUser) return;
+
+        const previousLiked = hasLiked;
+        const previousCount = likeCount;
+
+        // Optimistic Update
+        setHasLiked(!previousLiked);
+        setLikeCount(prev => previousLiked ? prev - 1 : prev + 1);
+        if (!previousLiked) setIsLikeAnimating(true);
+
+        try {
+            if (previousLiked) {
+                // Unlike
+                await supabase
+                    .from('story_likes' as any)
+                    .delete()
+                    .eq('story_id', story.id)
+                    .eq('user_id', currentUser.id);
+            } else {
+                // Like
+                await supabase
+                    .from('story_likes' as any)
+                    .insert({ story_id: story.id, user_id: currentUser.id });
+
+                // Show animation
+                setTimeout(() => setIsLikeAnimating(false), 1000);
+            }
+        } catch (error) {
+            console.error('Error toggling like:', error);
+            // Revert
+            setHasLiked(previousLiked);
+            setLikeCount(previousCount);
+        }
+    };
 
 
     // Reset progress on change
@@ -276,6 +338,38 @@ const StoryViewer = ({ stories, onClose }: StoryViewerProps) => {
                         </Button>
                     </div>
                 )}
+
+                {/* Like Button & Count (Bottom Right) */}
+                <div className="absolute bottom-4 right-4 z-30 pointer-events-auto flex items-center gap-2">
+                    {likeCount > 0 && (
+                        <span className="text-white text-xs font-medium drop-shadow-md">{likeCount}</span>
+                    )}
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="w-10 h-10 rounded-full bg-black/20 backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-colors"
+                        onClick={handleLike}
+                    >
+                        <Heart
+                            className={`w-6 h-6 transition-all ${hasLiked ? 'fill-red-500 text-red-500 scale-110' : 'text-white'}`}
+                        />
+                    </Button>
+                </div>
+
+                {/* Floating Heart Animation (Center) */}
+                <AnimatePresence>
+                    {isLikeAnimating && (
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.5, y: 0 }}
+                            animate={{ opacity: 1, scale: 1.5, y: -100 }}
+                            exit={{ opacity: 0, scale: 2 }}
+                            transition={{ duration: 0.8 }}
+                            className="absolute inset-0 flex items-center justify-center pointer-events-none z-40"
+                        >
+                            <Heart className="w-32 h-32 fill-red-500 text-red-500 drop-shadow-2xl" />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
                 {/* Viewers List Modal */}
                 <AnimatePresence>
