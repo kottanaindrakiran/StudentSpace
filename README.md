@@ -1,7 +1,6 @@
-﻿# StudentSpace
-# 🎓 StudentConnect Hub
+# 🎓 StudentSpace Hub
 
-**StudentConnect Hub** is a verified, student-centric social and academic networking platform designed to connect students and alumni across colleges. It combines the engagement of modern social platforms with the trust and focus required for academic collaboration.
+**StudentSpace Hub** is a verified, student-centric social and academic networking platform designed to connect students and alumni across colleges. It combines the engagement of modern social platforms with the trust and focus required for academic collaboration.
 <img width="1864" height="960" alt="image" src="https://github.com/user-attachments/assets/f4534aaa-417f-47d9-801b-0e4bdc28842d" />
 <img width="1898" height="964" alt="image" src="https://github.com/user-attachments/assets/db474f11-90d9-46e1-b67b-1fa0aa9f9210" />
 <img width="1880" height="962" alt="image" src="https://github.com/user-attachments/assets/0867442b-f4f2-44ee-97ad-4e8f37c928df" />
@@ -14,7 +13,7 @@
 
 In today’s digital world, students lack a **verified and focused platform** to collaborate beyond their campus. Existing social media platforms are noisy and unverified, while college portals are limited and rigid.
 
-**StudentConnect Hub** fills this gap by providing:
+**StudentSpace Hub** fills this gap by providing:
 - Verified student & alumni networking  
 - Campus-centric social feeds  
 - Academic project sharing  
@@ -223,4 +222,5 @@ Build output is generated in the `dist/` directory.
 
 ## ✅ Conclusion
 
-StudentConnect Hub demonstrates how modern serverless technologies can be combined to build a **secure, verified, and engaging student ecosystem**. The platform successfully bridges academic collaboration and social interaction while maintaining trust, privacy, and scalability.
+StudentSpace Hub demonstrates how modern serverless technologies can be combined to build a **secure, verified, and engaging student ecosystem**. The platform successfully bridges academic collaboration and social interaction while maintaining trust, privacy, and scalability.
+
