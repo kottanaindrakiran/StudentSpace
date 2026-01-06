@@ -23,6 +23,16 @@ import { Link } from 'react-router-dom';
 
 const PostCard = ({ post, isPlaying = false }: PostCardProps) => {
   const { data: currentUser } = useCurrentUser();
+
+  // Debug logging for Saved icon visibility - REMOVE BEFORE PROD
+  if (currentUser) {
+    console.log('PostCard Debug:', {
+      postId: post.id,
+      currentUserId: currentUser.id,
+      postUserId: post.user_id,
+      shouldShow: currentUser.id !== post.user_id
+    });
+  }
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
